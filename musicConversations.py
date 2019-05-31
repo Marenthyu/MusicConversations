@@ -35,6 +35,9 @@ channelname = None
 logins = None
 inputfile = None
 sentences = None
+messagechance = None
+messagetiming = None
+
 # read config values from file (db login etc)
 try:
     f = open("musicconversations.cfg", "r", encoding="utf-8")
@@ -47,24 +50,45 @@ try:
             try:
                 name, value = line.split("=", maxsplit=1)
                 value = str(value).strip("\n")
-                logger.info("Reading config value '%s' = '<redacted>'", name)
-                if name == "channel":
-                    channelname = value
-                if name == "users":
-                    logins = json.loads(value)
-                if name == "sentences":
-                    sentences = json.loads(value)
-                if name == "inputfile":
-                    inputfile = value
-                if name == "debug":
-                    if value == "True":
-                        ch.setLevel(logging.DEBUG)
-                        logger.warning("Debug console logging enabled, this may be spammy.")
             except Exception:
                 logger.warning("Something went wrong during config parsing, ignoring it...")
+                continue
+            logger.info("Reading config value '%s' = '<redacted>'", name)
+            if name == "channel":
+                channelname = value
+            if name == "users":
+                logins = json.loads(value)
+            if name == "sentences":
+                sentences = json.loads(value)
+            if name == "inputfile":
+                inputfile = value
+            if name == "messagechance":
+                messagechance = float(value)
+            if name == "messagetiming":
+                messagetiming = float(value)
+            if name == "debug":
+                if value == "True":
+                    ch.setLevel(logging.DEBUG)
+                    logger.warning("Debug console logging enabled, this may be spammy.")
+
     if channelname is None:
         logger.error("Channel Name not set. Please add it to the config file, with 'channel=<name>'")
         sys.exit(1)
+    if logins is None:
+        logger.error("No logins set. Please add at least one to the config file, with 'users=<list>'")
+        sys.exit(1)
+    if sentences is None:
+        logger.error("No sentences set. Please add at least one to the config file, with 'sentences=<list>'")
+        sys.exit(1)
+    if inputfile is None:
+        logger.error("No input file set. Please add it to the config file, with 'inputfile=<path>'")
+        sys.exit(1)
+    if messagechance is None:
+        logger.warning("No message chance set. using default value of 0.6")
+        messagechance = 0.6
+    if messagetiming is None:
+        logger.warning("No message timing set. using default value of 20")
+        messagetiming = 20
     f.close()
 except Exception:
     logger.error("Error reading config file (musicconversations.cfg), aborting.")
@@ -253,11 +277,26 @@ async def processFileChanges():
                             inputsentences = setting['sentences']
                             break
                     if inputsentences != None:
+                        # We have the sentences we want to send, now distribute them to the accounts...
+                        counter = 0
                         for instance in bots:
-                            await instance.doChat(random.choice(inputsentences))
+                            if random.uniform(0.0, 1.0) < messagechance:
+                                logger.debug("Hit chance, sending message...")
+                                counter = counter + 1
+                                if counter == len(bots):
+                                    # Last bot selected
+                                    asyncio.create_task(sendMessageAfterDelay(instance, messagetiming, random.choice(inputsentences)))
+                                    continue
+                                asyncio.create_task(sendMessageAfterDelay(instance, random.uniform(1.0, messagetiming), random.choice(inputsentences)))
+                            else:
+                                logger.debug("Did not hit chance. Not sending message")
                     else:
                         logger.debug("No sentences configured for %s", newInput)
 
+async def sendMessageAfterDelay(instance, delay, message):
+    logger.debug("Sending message in %s seconds", delay)
+    await asyncio.sleep(delay)
+    await instance.doChat(message)
 
 logger.info("All loaded up and running!")
 
