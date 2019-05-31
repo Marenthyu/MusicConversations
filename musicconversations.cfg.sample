@@ -1,0 +1,18 @@
+# Main Config File Sample. Rename to musicconversations.cfg after entering
+# Lines starting with # and empty lines are ignored.
+# All options require to be on a single line.
+
+# The name of the Twitch channel to join and write to
+channel=marenthyu
+
+# A JSON-Encoded array of the user accounts to use, each object having the attributes of name and token, representing the username and oauth token.
+users=[{"name":"nepnepbot", "token":"oauth:xxx"}, {"name":"marenthyu", "token":"oauth:xxx"}]
+
+# The location of the file to be watched for triggers
+inputfile=G:\streaming\currentsong.txt
+
+# A JSON-Encoded array of sentences mapped to input strings
+sentences=[{"sentences": ["O-oooooooooo AAAAE-A-A-I-A-U- JO-oooooooooooo AAE-O-A-A-U-U-A- E-eee-ee-eee AAAAE-A-E-I-E-A- JO-ooo-oo-oo-oo EEEEO-A-AAA-AAAA", "PogChamp", "Power time! Kappa"], "inputs":["NOMA - Brainpower"]}, {"sentences":["Such calming. Much Song. Yay", "Time to chill", "I love this song~"], "inputs":["Super Mario 64 - Ending Theme Remix - AJ DiSpirito", "Rainbow Road (Mario a Country Roads)"]}]
+
+# Add more debug output to the console. May be spammy.
+debug=True
