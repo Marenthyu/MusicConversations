@@ -14,5 +14,5 @@ inputfile=G:\streaming\currentsong.txt
 # A JSON-Encoded array of sentences mapped to input strings
 sentences=[{"sentences": ["O-oooooooooo AAAAE-A-A-I-A-U- JO-oooooooooooo AAE-O-A-A-U-U-A- E-eee-ee-eee AAAAE-A-E-I-E-A- JO-ooo-oo-oo-oo EEEEO-A-AAA-AAAA", "PogChamp", "Power time! Kappa"], "inputs":["NOMA - Brainpower"]}, {"sentences":["Such calming. Much Song. Yay", "Time to chill", "I love this song~"], "inputs":["Super Mario 64 - Ending Theme Remix - AJ DiSpirito", "Rainbow Road (Mario a Country Roads)"]}]
 
-# Add more debug output to the console. May be spammy.
-debug=True
+# Add more debug output to the console. May be spammy. (Any value other than True will be interpreted as False.)
+debug=False
