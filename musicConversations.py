@@ -37,25 +37,31 @@ inputfile = None
 sentences = None
 # read config values from file (db login etc)
 try:
-    f = open("musicconversations.cfg", "r")
+    f = open("musicconversations.cfg", "r", encoding="utf-8")
     lines = f.readlines()
     for line in lines:
-        if not line.startswith('#') and not line.startswith("\n"):
-            name, value = line.split("=", maxsplit=1)
-            value = str(value).strip("\n")
-            logger.info("Reading config value '%s' = '<redacted>'", name)
-            if name == "channel":
-                channelname = value
-            if name == "users":
-                logins = json.loads(value)
-            if name == "sentences":
-                sentences = json.loads(value)
-            if name == "inputfile":
-                inputfile = value
-            if name == "debug":
-                if value == "True":
-                    ch.setLevel(logging.DEBUG)
-                    logger.warning("Debug console logging enabled, this may be spammy.")
+        logger.debug("Current line: %s", line)
+        line = line.strip()
+        if not line.startswith('#') and not line.startswith("\n") and not line == "":
+            logger.debug("Trying to parse line...")
+            try:
+                name, value = line.split("=", maxsplit=1)
+                value = str(value).strip("\n")
+                logger.info("Reading config value '%s' = '<redacted>'", name)
+                if name == "channel":
+                    channelname = value
+                if name == "users":
+                    logins = json.loads(value)
+                if name == "sentences":
+                    sentences = json.loads(value)
+                if name == "inputfile":
+                    inputfile = value
+                if name == "debug":
+                    if value == "True":
+                        ch.setLevel(logging.DEBUG)
+                        logger.warning("Debug console logging enabled, this may be spammy.")
+            except Exception:
+                logger.warning("Something went wrong during config parsing, ignoring it...")
     if channelname is None:
         logger.error("Channel Name not set. Please add it to the config file, with 'channel=<name>'")
         sys.exit(1)
